@@ -7,4 +7,4 @@ JAVA_EXE="/usr/bin/java"
 JAR_FILE="./VenturaApp.jar"
 
 # Invoke the Java application
-$JAVA_EXE -jar $JAR_FILE -DDEBUG=false -DSETTINGS_FILE=./ventura.properties
+$JAVA_EXE -jar $JAR_FILE -Ddebug=false -DsettingsFile=./ventura.properties
