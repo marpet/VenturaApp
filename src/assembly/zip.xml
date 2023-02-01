@@ -12,14 +12,17 @@
             <source>${project.build.directory}/${project.artifactId}-${project.version}.jar</source>
             <destName>VenturaApp.jar</destName>
             <outputDirectory>/</outputDirectory>
+            <fileMode>444</fileMode>
         </file>
         <file>
             <source>${project.basedir}/src/etc/ventura.sh</source>
             <outputDirectory>/</outputDirectory>
+            <fileMode>744</fileMode>
         </file>
         <file>
             <source>${project.basedir}/src/etc/ventura.properties</source>
             <outputDirectory>/</outputDirectory>
+            <fileMode>644</fileMode>
         </file>
     </files>
 </assembly>

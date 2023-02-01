@@ -2,7 +2,6 @@ package com.bc;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JInternalFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -22,16 +21,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Iterator;
 import java.util.Properties;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 public class Ventura {
-    public static final String PROP_SETTINGS_FILE = "settingsFile";
-    public static final String PROP_DEBUG = "debug";
-    public static final String PROP_VENTURA_LAF = "venturaLaf";
+    private static final String PROP_SETTINGS_FILE = "settingsFile";
+    private static final String PROP_DEBUG = "debug";
+    private static final String PROP_VENTURA_LAF = "venturaLaf";
+    @SuppressWarnings("unused")
     private static final boolean DEBUG = Boolean.getBoolean(PROP_DEBUG);
 
     public static void main(String[] args) throws Exception {
@@ -91,12 +90,11 @@ public class Ventura {
         JMenu helpMenu = new JMenu("Help");
         menuBar.add(helpMenu);
         helpMenu.add(createMenuItem("About"));
-        helpMenu.add(createMenuItem("Properties", a -> showProperties()));
+        helpMenu.add(createMenuItem("Properties", a -> showProperties(frame)));
     }
 
-    private static void showProperties() {
+    private static void showProperties(Component parent) {
         JTable table = new JTable(createSystemPropertiesTableModel()) {
-            private static final long   serialVersionUID    = 4957089825220999913L;
 
             @Override
             public Component prepareRenderer(TableCellRenderer renderer,
@@ -114,6 +112,7 @@ public class Ventura {
         scrollPane.setSize(200, 300);
         JFrame jFrame = new JFrame("Properties");
         jFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        jFrame.setLocationRelativeTo(parent);
         jFrame.add(scrollPane);
         jFrame.pack();
         jFrame.setVisible(true);
@@ -127,7 +126,7 @@ public class Ventura {
 
         Properties p = System.getProperties();
         Set<Object> keys = p.keySet();
-        SortedSet<Object> sortedKeys = new TreeSet<Object>(keys);
+        SortedSet<Object> sortedKeys = new TreeSet<>(keys);
 
         for (Object sortedKey : sortedKeys) {
             String key = sortedKey.toString();
