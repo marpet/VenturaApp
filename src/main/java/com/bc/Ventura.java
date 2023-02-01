@@ -1,11 +1,15 @@
 package com.bc;
 
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.UIManager;
@@ -14,8 +18,10 @@ import javax.swing.WindowConstants;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import java.awt.Component;
+import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.GridLayout;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,6 +31,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+
 
 public class Ventura {
     private static final String PROP_SETTINGS_FILE = "settingsFile";
@@ -52,22 +59,6 @@ public class Ventura {
         });
     }
 
-    private static void setLaf() throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
-        String venturaLaf = System.getProperty(PROP_VENTURA_LAF);
-        if (venturaLaf != null) {
-            UIManager.setLookAndFeel(venturaLaf);
-        }
-    }
-
-    private static void loadSettings() throws IOException {
-        String propFile = System.getProperty(PROP_SETTINGS_FILE);
-        if (propFile != null) {
-            try (InputStream inStream = Files.newInputStream(Paths.get(propFile))) {
-                System.getProperties().load(inStream);
-            }
-        }
-    }
-
     private static void addMainMenu(JFrame frame) {
 
         JMenuBar menuBar = new JMenuBar();
@@ -81,7 +72,7 @@ public class Ventura {
 
         JMenu otherMenu = new JMenu("Other");
         menuBar.add(otherMenu);
-        otherMenu.add(createMenuItem("Settings"));
+        otherMenu.add(createMenuItem("Settings", a -> showSettings(frame)));
         JMenu toolsMenu = new JMenu("Tools");
         otherMenu.add(toolsMenu);
         toolsMenu.add(createMenuItem("Tools 1"));
@@ -91,6 +82,40 @@ public class Ventura {
         menuBar.add(helpMenu);
         helpMenu.add(createMenuItem("About"));
         helpMenu.add(createMenuItem("Properties", a -> showProperties(frame)));
+    }
+
+    private static void showSettings(JFrame frame) {
+        JDialog dialog = new JDialog(frame, "Settings", Dialog.ModalityType.APPLICATION_MODAL);
+        dialog.setPreferredSize(new Dimension(180, 200));
+        JPanel settingsPanel = new JPanel(new GridLayout(4, 1, 4, 4));
+        dialog.add(settingsPanel);
+
+        JCheckBox menuBarBox = new JCheckBox("Use Screen menu Bar");
+        menuBarBox.setSelected(Boolean.getBoolean("apple.laf.useScreenMenuBar"));
+        menuBarBox.addActionListener(e -> System.setProperty("apple.laf.useScreenMenuBar", String.valueOf(menuBarBox.isSelected())));
+        settingsPanel.add(menuBarBox);
+
+        JCheckBox brushLookBox = new JCheckBox("Use Brush Metal Look");
+        brushLookBox.setSelected(Boolean.getBoolean("apple.awt.brushMetalLook"));
+        brushLookBox.addActionListener(e -> System.setProperty("apple.awt.brushMetalLook", String.valueOf(brushLookBox.isSelected())));
+        settingsPanel.add(brushLookBox);
+
+        JCheckBox aliasingBox = new JCheckBox("Use Text Anti-Aliasing");
+        aliasingBox.setSelected(Boolean.getBoolean("apple.awt.textantialiasing"));
+        aliasingBox.addActionListener(e -> System.setProperty("apple.awt.textantialiasing", String.valueOf(aliasingBox.isSelected())));
+        settingsPanel.add(aliasingBox);
+
+        JButton closeButton = new JButton("Close");
+        closeButton.setPreferredSize(new Dimension(100, 60));
+        closeButton.setDefaultCapable(true);
+        closeButton.addActionListener(e -> {
+            dialog.setVisible(false);
+            dialog.dispose();
+        });
+        settingsPanel.add(closeButton);
+        dialog.pack();
+        dialog.setLocationRelativeTo(frame);
+        dialog.setVisible(true);
     }
 
     private static void showProperties(Component parent) {
@@ -148,6 +173,22 @@ public class Ventura {
         JMenuItem item = new JMenuItem(itemName);
         item.addActionListener(e -> showMessage(item));
         return item;
+    }
+
+    private static void setLaf() throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
+        String venturaLaf = System.getProperty(PROP_VENTURA_LAF);
+        if (venturaLaf != null) {
+            UIManager.setLookAndFeel(venturaLaf);
+        }
+    }
+
+    private static void loadSettings() throws IOException {
+        String propFile = System.getProperty(PROP_SETTINGS_FILE);
+        if (propFile != null) {
+            try (InputStream inStream = Files.newInputStream(Paths.get(propFile))) {
+                System.getProperties().load(inStream);
+            }
+        }
     }
 
     private static void showMessage(JMenuItem clickedItem) {
